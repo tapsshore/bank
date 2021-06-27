@@ -113,4 +113,17 @@ public class TransactionServiceUTest {
         assertEquals(BigDecimal.valueOf(-99_990), withdrawResponse.getBody().getNewBalance());
         verify(accountRepository, times(1)).save(any(Account.class));
     }
+    @Test
+    public void shouldFailIfWithdrawalAmountIsGreaterThanLimit(){
+        WithdrawRequestDto dto = WithdrawRequestDto.builder()
+                .accountNumber("123456")
+                .amount(BigDecimal.valueOf(120_000))
+                .build();
+        account.setBalance(BigDecimal.TEN);
+        ReflectionTestUtils.setField(transactionService, "overdraftAmount", BigDecimal.valueOf(100_000));
+        when(accountRepository.findByAccountNumber(dto.getAccountNumber())).thenReturn(Optional.of(account));
+        ResponseEntity<WithdrawResponseDto> withdrawResponse = transactionService.withdraw(dto);
+        assertEquals(HttpStatus.BAD_REQUEST, withdrawResponse.getStatusCode());
+        verify(accountRepository, times(0)).save(any(Account.class));
+    }
 }
