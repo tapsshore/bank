@@ -51,7 +51,6 @@ public class AccountServiceUTest {
         assertEquals(HttpStatus.BAD_REQUEST, createAccountResponseDtoResponseEntity.getStatusCode());
         verify(accountRepository, times(0)).save(any(Account.class));
 
-
     }
     private CreateAccountRequestDto createAccountRequestDto(){
         CreateAccountRequestDto createAccountRequestDto = new CreateAccountRequestDto();
@@ -63,5 +62,9 @@ public class AccountServiceUTest {
         createAccountRequestDto.setPhoneNumber("tstst");
         return createAccountRequestDto;
     }
-
+    @Test
+    public void shouldCreateSavingsAccount(){
+        account.setAccountNumber("12345678");
+        account.setAccountType(AccountType.SAVINGS);
+    }
 }
