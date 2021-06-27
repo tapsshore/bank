@@ -54,6 +54,19 @@ public class TransactionServiceUTest {
         assertEquals("Account 123456 not found!", depositResponse.getBody().getMessage());
         verify(accountRepository, times(0)).save(any(Account.class));
     }
+    @Test
+    public void shouldFailToDepositIfAmountIsLessThanOne() {
 
+        DepositRequestDto dto = DepositRequestDto.builder()
+                .accountNumber("123456")
+                .amount(BigDecimal.ZERO)
+                .build();
+
+        ResponseEntity<DepositResponseDto> depositResponse = transactionService.deposit(dto);
+
+        assertEquals(HttpStatus.BAD_REQUEST, depositResponse.getStatusCode());
+        assertEquals("Invalid deposit amount", depositResponse.getBody().getMessage());
+        verify(accountRepository, times(0)).save(any(Account.class));
+    }
 
 }
