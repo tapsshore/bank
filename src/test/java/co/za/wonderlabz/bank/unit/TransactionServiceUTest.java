@@ -162,4 +162,16 @@ public class TransactionServiceUTest {
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
         assertEquals("Amount greater than account balance", responseEntity.getBody().getMessage());
     }
+    @Test
+    public void shouldFailTransferIfAccountNotExist() {
+        TransferRequestDto dto = TransferRequestDto.builder()
+                .sourceAccount("123456")
+                .destinationAccount("654321")
+                .build();
+        when(accountRepository.findByAccountNumber("123456")).thenReturn(Optional.empty());
+        ResponseEntity<TransferResponseDto> responseEntity = transactionService.transfer(dto);
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals("Account 123456 not found!", responseEntity.getBody().getMessage());
+        verify(accountRepository, times(0)).save(any(Account.class));
+    }
 }
