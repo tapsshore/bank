@@ -1,10 +1,7 @@
 package co.za.wonderlabz.bank.unit;
 
 import co.za.wonderlabz.bank.domain.Account;
-import co.za.wonderlabz.bank.dtos.DepositRequestDto;
-import co.za.wonderlabz.bank.dtos.DepositResponseDto;
-import co.za.wonderlabz.bank.dtos.WithdrawRequestDto;
-import co.za.wonderlabz.bank.dtos.WithdrawResponseDto;
+import co.za.wonderlabz.bank.dtos.*;
 import co.za.wonderlabz.bank.repo.AccountRepository;
 import co.za.wonderlabz.bank.service.TransactionHistoryService;
 import co.za.wonderlabz.bank.service.TransactionServiceImpl;
@@ -136,5 +133,33 @@ public class TransactionServiceUTest {
         ResponseEntity<WithdrawResponseDto> withdrawResponse = transactionService.withdraw(dto);
         assertEquals(HttpStatus.BAD_REQUEST, withdrawResponse.getStatusCode());
         verify(accountRepository, times(0)).save(any(Account.class));
+    }
+    @Test
+    public void shouldFailTransferForSameAccount() {
+        TransferRequestDto dto = TransferRequestDto.builder()
+                .sourceAccount("123456")
+                .destinationAccount("123456")
+                .build();
+        transactionService.transfer(dto);
+        ResponseEntity<TransferResponseDto> responseEntity = transactionService.transfer(dto);
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals("Cannot transfer to the same account 123456!", responseEntity.getBody().getMessage());
+    }
+    @Test
+    public void shouldFailTransferIfInsufficientBalance() {
+        TransferRequestDto dto = TransferRequestDto.builder()
+                .sourceAccount("123456")
+                .destinationAccount("654321")
+                .amount(BigDecimal.TEN)
+                .reason("xzy")
+                .build();
+        Account sourceAccount = account;
+        Account destinationAccount = account;
+        sourceAccount.setBalance(BigDecimal.ZERO);
+        when(accountRepository.findByAccountNumber("123456")).thenReturn(Optional.of(sourceAccount));
+        when(accountRepository.findByAccountNumber("654321")).thenReturn(Optional.of(destinationAccount));
+        ResponseEntity<TransferResponseDto> responseEntity = transactionService.transfer(dto);
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals("Amount greater than account balance", responseEntity.getBody().getMessage());
     }
 }
