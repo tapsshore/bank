@@ -26,6 +26,7 @@ public class AccountServiceImpl implements AccountService {
     private Double initialDeposit;
     @Autowired
     private Mapper mapper;
+
     @Override
     public ResponseEntity<CreateAccountResponseDto> create(CreateAccountRequestDto createAccountRequest) {
 
@@ -43,6 +44,14 @@ public class AccountServiceImpl implements AccountService {
             }
             account.setBalance(createAccountRequest.getInitialDeposit());
         }
-        return null;
+        account = accountRepository.save(account);
+        String message = "Account created successfully";
+        log.info("{} {}", message, account);
+        CreateAccountResponseDto createAccountResponseDto = CreateAccountResponseDto.builder()
+                .message(message)
+                .accountNumber(account.getAccountNumber())
+                .accountType(account.getAccountType())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(createAccountResponseDto);
     }
 }

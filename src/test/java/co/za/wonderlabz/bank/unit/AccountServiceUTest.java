@@ -66,5 +66,15 @@ public class AccountServiceUTest {
     public void shouldCreateSavingsAccount(){
         account.setAccountNumber("12345678");
         account.setAccountType(AccountType.SAVINGS);
+        CreateAccountRequestDto dto = createAccountRequestDto();
+        dto.setInitialDeposit(BigDecimal.valueOf(2000));
+        dto.setAccountType(AccountType.SAVINGS);
+        ReflectionTestUtils.setField(accountService,"initialDeposit",1000.00);
+
+        when(accountRepository.save(any(Account.class))).thenReturn(account);
+        when(mapper.map(any(CreateAccountRequestDto.class), any())).thenReturn(account);
+        ResponseEntity<CreateAccountResponseDto> createAccountResponseDtoResponseEntity = accountService.create(dto);
+        assertEquals(HttpStatus.OK, createAccountResponseDtoResponseEntity.getStatusCode());
+        verify(accountRepository, times(1)).save(any(Account.class));
     }
 }
