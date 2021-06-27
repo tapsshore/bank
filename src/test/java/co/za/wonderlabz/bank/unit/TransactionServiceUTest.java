@@ -126,4 +126,15 @@ public class TransactionServiceUTest {
         assertEquals(HttpStatus.BAD_REQUEST, withdrawResponse.getStatusCode());
         verify(accountRepository, times(0)).save(any(Account.class));
     }
+    @Test
+    public void shouldFailWithdrawalForInvalidAmount(){
+        WithdrawRequestDto dto = WithdrawRequestDto.builder()
+                .accountNumber("123456")
+                .amount(BigDecimal.ZERO)
+                .build();
+        ReflectionTestUtils.setField(transactionService, "overdraftAmount", BigDecimal.valueOf(100_000));
+        ResponseEntity<WithdrawResponseDto> withdrawResponse = transactionService.withdraw(dto);
+        assertEquals(HttpStatus.BAD_REQUEST, withdrawResponse.getStatusCode());
+        verify(accountRepository, times(0)).save(any(Account.class));
+    }
 }
