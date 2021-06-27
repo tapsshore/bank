@@ -98,4 +98,19 @@ public class TransactionServiceUTest {
         assertEquals("Account 123456 not found!", withdrawResponse.getBody().getMessage());
         verify(accountRepository, times(0)).save(any(Account.class));
     }
+    @Test
+    public void shouldDecreaseBalanceOnWithDraw() {
+        WithdrawRequestDto dto = WithdrawRequestDto.builder()
+                .accountNumber("123456")
+                .amount(BigDecimal.valueOf(100_000))
+                .build();
+        account.setBalance(BigDecimal.TEN);
+        ReflectionTestUtils.setField(transactionService, "overdraftAmount", BigDecimal.valueOf(100_000));
+        when(accountRepository.findByAccountNumber(dto.getAccountNumber())).thenReturn(Optional.of(account));
+        when(accountRepository.save(any(Account.class))).thenReturn(account);
+        ResponseEntity<WithdrawResponseDto> withdrawResponse = transactionService.withdraw(dto);
+        assertEquals(HttpStatus.OK, withdrawResponse.getStatusCode());
+        assertEquals(BigDecimal.valueOf(-99_990), withdrawResponse.getBody().getNewBalance());
+        verify(accountRepository, times(1)).save(any(Account.class));
+    }
 }
