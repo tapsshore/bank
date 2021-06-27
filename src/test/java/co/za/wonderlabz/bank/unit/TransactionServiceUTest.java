@@ -3,6 +3,8 @@ package co.za.wonderlabz.bank.unit;
 import co.za.wonderlabz.bank.domain.Account;
 import co.za.wonderlabz.bank.dtos.DepositRequestDto;
 import co.za.wonderlabz.bank.dtos.DepositResponseDto;
+import co.za.wonderlabz.bank.dtos.WithdrawRequestDto;
+import co.za.wonderlabz.bank.dtos.WithdrawResponseDto;
 import co.za.wonderlabz.bank.repo.AccountRepository;
 import co.za.wonderlabz.bank.service.TransactionHistoryService;
 import co.za.wonderlabz.bank.service.TransactionServiceImpl;
@@ -84,5 +86,16 @@ public class TransactionServiceUTest {
         assertEquals(BigDecimal.valueOf(20), depositResponse.getBody().getNewBalance());
         verify(accountRepository, times(1)).save(any(Account.class));
     }
-
+    @Test
+    public void shouldFailToWithdrawIfAccountDoesNotExist() {
+        WithdrawRequestDto dto = WithdrawRequestDto.builder()
+                .accountNumber("123456")
+                .amount(BigDecimal.TEN)
+                .build();
+        account.setBalance(BigDecimal.TEN);
+        ResponseEntity<WithdrawResponseDto> withdrawResponse = transactionService.withdraw(dto);
+        assertEquals(HttpStatus.BAD_REQUEST, withdrawResponse.getStatusCode());
+        assertEquals("Account 123456 not found!", withdrawResponse.getBody().getMessage());
+        verify(accountRepository, times(0)).save(any(Account.class));
+    }
 }
