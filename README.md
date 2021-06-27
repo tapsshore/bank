@@ -40,6 +40,6 @@ are defined here
   http://localhost:8080/swagger-ui.html
 
 ###In live environment the following features will be implemented
-- capturing of customer details for KYC
-- all user details validation
+- all user details validation(email/phone number)
 - A separate database for transaction logs will be used
+- docker will be used for containerization 
