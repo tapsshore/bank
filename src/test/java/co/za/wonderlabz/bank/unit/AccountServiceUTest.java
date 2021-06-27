@@ -2,6 +2,7 @@ package co.za.wonderlabz.bank.unit;
 
 import co.za.wonderlabz.bank.domain.Account;
 import co.za.wonderlabz.bank.dtos.CreateAccountRequestDto;
+import co.za.wonderlabz.bank.dtos.CreateAccountResponseDto;
 import co.za.wonderlabz.bank.enums.AccountType;
 import co.za.wonderlabz.bank.repo.AccountRepository;
 import co.za.wonderlabz.bank.service.AccountServiceImpl;
@@ -12,12 +13,15 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AccountServiceUTest {
@@ -43,6 +47,9 @@ public class AccountServiceUTest {
         dto.setAccountType(AccountType.SAVINGS);
         ReflectionTestUtils.setField(accountService,"initialDeposit",1000.00);
         when(mapper.map(any(CreateAccountRequestDto.class), any())).thenReturn(account);
+        ResponseEntity<CreateAccountResponseDto> createAccountResponseDtoResponseEntity = accountService.create(dto);
+        assertEquals(HttpStatus.BAD_REQUEST, createAccountResponseDtoResponseEntity.getStatusCode());
+        verify(accountRepository, times(0)).save(any(Account.class));
 
 
     }
