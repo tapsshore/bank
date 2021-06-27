@@ -174,4 +174,32 @@ public class TransactionServiceUTest {
         assertEquals("Account 123456 not found!", responseEntity.getBody().getMessage());
         verify(accountRepository, times(0)).save(any(Account.class));
     }
+    @Test
+    public void shouldTransfer() {
+        TransferRequestDto dto = TransferRequestDto.builder()
+                .sourceAccount("123456")
+                .destinationAccount("654321")
+                .amount(BigDecimal.TEN)
+                .reason("xzy")
+                .build();
+        Account sourceAccount = new Account();
+        Account destinationAccount = account;
+        sourceAccount.setBalance(BigDecimal.TEN);
+        when(accountRepository.findByAccountNumber("123456")).thenReturn(Optional.of(sourceAccount));
+        when(accountRepository.findByAccountNumber("654321")).thenReturn(Optional.of(destinationAccount));
+
+
+        Account updatedSourceAccount = new Account();
+        updatedSourceAccount.setBalance(BigDecimal.ZERO);
+
+        Account updatedDestinationAccount = account;
+        updatedDestinationAccount.setBalance(BigDecimal.TEN);
+
+        when(accountRepository.save(updatedSourceAccount)).thenReturn(updatedSourceAccount);
+        when(accountRepository.save(updatedDestinationAccount)).thenReturn(updatedDestinationAccount);
+        ResponseEntity<TransferResponseDto> responseEntity = transactionService.transfer(dto);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        verify(accountRepository, times(2)).save(any(Account.class));
+
+    }
 }
