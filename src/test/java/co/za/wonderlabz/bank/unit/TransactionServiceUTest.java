@@ -68,5 +68,21 @@ public class TransactionServiceUTest {
         assertEquals("Invalid deposit amount", depositResponse.getBody().getMessage());
         verify(accountRepository, times(0)).save(any(Account.class));
     }
+    @Test
+    public void shouldIncreaseBalance(){
+        DepositRequestDto dto = DepositRequestDto.builder()
+                .accountNumber("123456")
+                .amount(BigDecimal.TEN)
+                .build();
+        account.setBalance(BigDecimal.TEN);
+        when(accountRepository.findByAccountNumber(dto.getAccountNumber())).thenReturn(Optional.of(account));
+        when(accountRepository.save(any(Account.class))).thenReturn(account);
+
+        ResponseEntity<DepositResponseDto> depositResponse = transactionService.deposit(dto);
+
+        assertEquals(HttpStatus.OK, depositResponse.getStatusCode());
+        assertEquals(BigDecimal.valueOf(20), depositResponse.getBody().getNewBalance());
+        verify(accountRepository, times(1)).save(any(Account.class));
+    }
 
 }
