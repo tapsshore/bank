@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Service
 @Slf4j
@@ -32,6 +33,7 @@ public class AccountServiceImpl implements AccountService {
 
         Account account = mapper.map(createAccountRequest, Account.class);
         account.setAccountNumber(Instant.now().getEpochSecond() + "");
+        account.setDateCreated(LocalDateTime.now());
 
         if (createAccountRequest.getAccountType() == AccountType.SAVINGS) {
             if (createAccountRequest.getInitialDeposit() == null || createAccountRequest.getInitialDeposit().doubleValue() < initialDeposit) {
