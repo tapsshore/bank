@@ -2,7 +2,6 @@ package co.za.wonderlabz.bank.domain;
 
 import co.za.wonderlabz.bank.enums.AccountType;
 import lombok.Data;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
