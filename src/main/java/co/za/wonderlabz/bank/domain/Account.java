@@ -23,7 +23,10 @@ public class Account {
     private String phoneNumber;
     private String emailAddress;
     private BigDecimal balance;
-    @CreatedDate
     private LocalDateTime dateCreated;
 
+    @PrePersist
+    public void init(){
+        dateCreated = LocalDateTime.now();
+    }
 }

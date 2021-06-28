@@ -33,7 +33,6 @@ public class AccountServiceImpl implements AccountService {
 
         Account account = mapper.map(createAccountRequest, Account.class);
         account.setAccountNumber(Instant.now().getEpochSecond() + "");
-        account.setDateCreated(LocalDateTime.now());
 
         if (createAccountRequest.getAccountType() == AccountType.SAVINGS) {
             if (createAccountRequest.getInitialDeposit() == null || createAccountRequest.getInitialDeposit().doubleValue() < initialDeposit) {

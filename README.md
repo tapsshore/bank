@@ -43,3 +43,5 @@ are defined here
 - all user details validation(email/phone number)
 - A separate database for transaction logs will be used
 - docker will be used for containerization 
+- an algorithm for generating account numbers and transaction references
+- use a proper database rather than in memory h2

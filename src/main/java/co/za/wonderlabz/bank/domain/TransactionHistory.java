@@ -30,9 +30,11 @@ public class TransactionHistory {
     @Enumerated(EnumType.STRING)
     private TransactionType transactionType;
     private BigDecimal amount;
-    @CreatedDate
     private LocalDateTime transactionTime;
 
-
+    @PrePersist
+    public void init(){
+        transactionTime = LocalDateTime.now();
+    }
 
 }
